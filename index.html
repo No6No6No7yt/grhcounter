@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Synapse Z Crash Fix Timer</title>
     <style>
@@ -61,28 +60,58 @@
             font-weight: bold;
         }
 
-        .audio-control {
-            margin-top: 20px;
-            padding: 10px 30px;
-            font-size: 18px;
+        .cool-button {
+            position: relative;
+            padding: 12px 24px;
+            font-size: 16px;
             font-weight: bold;
             color: white;
-            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            background-image: linear-gradient(to right, #8B5CF6, #EC4899);
             border: none;
-            border-radius: 30px;
+            border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
             transition: all 0.3s ease;
+            margin-top: 20px;
         }
 
-        .audio-control:hover {
-            background: linear-gradient(135deg, #ff4b2b, #ff416c);
-            transform: translateY(-3px);
-            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
+        .cool-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            animation: pulse 1.5s infinite;
         }
 
-        .audio-control:focus {
-            outline: none;
+        .cool-button:hover::before {
+            opacity: 1;
+        }
+
+        .cool-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(to right, #7C3AED, #DB2777);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .cool-button span {
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(139, 92, 246, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(139, 92, 246, 0);
+            }
         }
     </style>
 </head>
@@ -102,7 +131,9 @@
     <div class="content">
         <h1>How long GRH takes to fix crashes on Synapse Z</h1>
         <div class="timer" id="timer"></div>
-        <button class="audio-control" onclick="toggleMusic()">Play Music</button>
+        <button class="cool-button" onclick="toggleMusic()">
+            <span id="music-button-text">Play Music</span>
+        </button>
     </div>
 
     <script>
@@ -127,12 +158,13 @@
 
         function toggleMusic() {
             const audio = document.getElementById('background-music');
+            const buttonText = document.getElementById('music-button-text');
             if (audio.paused) {
                 audio.play();
-                document.querySelector('.audio-control').textContent = 'Pause Music';
+                buttonText.textContent = 'Pause Music';
             } else {
                 audio.pause();
-                document.querySelector('.audio-control').textContent = 'Play Music';
+                buttonText.textContent = 'Play Music';
             }
         }
     </script>
