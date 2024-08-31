@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Synapse Z Crash Fix Timer</title>
+    <title>Music Player Interface</title>
     <style>
         :root {
             --primary: #ff1493;
             --secondary: #00ffff;
             --background: #1a1a1a;
+            --text-color: #333;
         }
 
         body {
@@ -45,6 +46,9 @@
         .content-wrapper {
             position: relative;
             z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .content {
@@ -65,76 +69,63 @@
         .timer {
             font-size: 32px;
             font-weight: bold;
+            margin-bottom: 20px;
         }
 
-        .ultra-button {
-            position: relative;
-            padding: 20px 40px;
-            font-size: 24px;
-            font-weight: bold;
-            text-transform: uppercase;
-            color: #fff;
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        .player-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
             margin-top: 20px;
         }
 
-        .ultra-button::before {
+        .player-controls button {
+            background: var(--primary);
+            border: none;
+            border-radius: 50%;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 24px;
+            height: 60px;
+            width: 60px;
+            margin: 0 15px;
+            transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+        }
+
+        .player-controls button::before {
             content: '';
             position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(45deg, var(--primary), var(--secondary), var(--primary));
-            z-index: -1;
-            filter: blur(10px);
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
             opacity: 0;
             transition: opacity 0.3s ease;
         }
 
-        .ultra-button:hover::before {
+        .player-controls button:hover::before {
             opacity: 1;
         }
 
-        .ultra-button:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-            animation: float 3s ease-in-out infinite;
+        .player-controls button:hover {
+            background: var(--secondary);
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
         }
 
-        .ultra-button:active {
-            transform: translateY(-2px) scale(0.98);
+        .player-controls button:disabled {
+            background: #777;
+            cursor: not-allowed;
         }
 
-        .ultra-button span {
-            position: relative;
-            z-index: 1;
-        }
-
-        .ultra-button .sparkle {
-            position: absolute;
-            background: #fff;
-            width: 3px;
-            height: 3px;
-            border-radius: 50%;
-            opacity: 0;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+        .current-song {
+            margin-top: 20px;
+            font-size: 20px;
+            color: var(--text-color);
         }
     </style>
 </head>
@@ -150,15 +141,20 @@
         <div class="content">
             <h1>How long GRH takes to fix crashes on Synapse Z</h1>
             <div class="timer" id="timer"></div>
-            <button class="ultra-button" id="ultraButton">
-                <span>Play Music</span>
-            </button>
+
+            <div class="current-song" id="current-song">Current Song: None</div>
+
+            <div class="player-controls">
+                <button id="prev-btn" disabled>&#9664;</button>
+                <button id="play-btn">Play</button>
+                <button id="next-btn" disabled>&#9654;&#9654;</button>
+            </div>
         </div>
     </div>
 
     <audio id="background-music" loop>
         <source src="sigma.mp3" type="audio/mp3">
-        Your browser does not support the audio tag.
+        Your browser does not support the audio element.
     </audio>
 
     <script>
@@ -181,42 +177,71 @@
 
         updateTimer();
 
-        const button = document.getElementById('ultraButton');
+        const playlist = [
+            { title: "kompa pasion", src: "sigma.mp3" },
+            { title: "Cucurella Barella Nutella", src: "cu.mp3" }
+        ];
 
-        function createSparkle(e) {
-            const sparkle = document.createElement('div');
-            sparkle.className = 'sparkle';
-            
-            const size = Math.random() * 5 + 3;
-            sparkle.style.width = `${size}px`;
-            sparkle.style.height = `${size}px`;
-            
-            sparkle.style.left = `${e.offsetX}px`;
-            sparkle.style.top = `${e.offsetY}px`;
-            
-            button.appendChild(sparkle);
-            
-            sparkle.animate([
-                { transform: 'translate(0, 0)', opacity: 1 },
-                { transform: `translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px)`, opacity: 0 }
-            ], {
-                duration: 1000,
-                easing: 'cubic-bezier(0,0,0.2,1)'
-            }).onfinish = () => sparkle.remove();
+        const audio = document.getElementById('background-music');
+        const playButton = document.getElementById('play-btn');
+        const prevButton = document.getElementById('prev-btn');
+        const nextButton = document.getElementById('next-btn');
+        const currentSongElement = document.getElementById('current-song');
+
+        let currentIndex = 0;
+        let isFirstInteraction = false;
+
+        function playSong(index) {
+            if (index >= 0 && index < playlist.length) {
+                audio.src = playlist[index].src;
+                audio.play().catch(() => {});
+                playButton.innerHTML = '&#10074;&#10074;';
+                currentSongElement.textContent = `Current Song: ${playlist[index].title}`;
+                currentIndex = index;
+                updateButtonStates();
+            }
         }
 
-        button.addEventListener('mousemove', createSparkle);
+        function updateButtonStates() {
+            prevButton.disabled = currentIndex === 0;
+            nextButton.disabled = currentIndex === playlist.length - 1;
+        }
 
-        button.addEventListener('click', function() {
-            const audio = document.getElementById('background-music');
-            if (audio.paused) {
-                audio.play();
-                button.querySelector('span').textContent = 'Pause Music';
+        playButton.addEventListener('click', () => {
+            if (!isFirstInteraction) {
+                isFirstInteraction = true;
+                audio.play().catch(() => {}); 
             } else {
-                audio.pause();
-                button.querySelector('span').textContent = 'Play Music';
+                if (audio.paused) {
+                    audio.play();
+                    playButton.innerHTML = '&#10074;&#10074;';
+                } else {
+                    audio.pause();
+                    playButton.innerHTML = '&#9654;';
+                }
             }
         });
+
+        prevButton.addEventListener('click', () => {
+            if (currentIndex > 0) {
+                playSong(currentIndex - 1);
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (currentIndex < playlist.length - 1) {
+                playSong(currentIndex + 1);
+            }
+        });
+
+        document.addEventListener('click', () => {
+            if (!isFirstInteraction) {
+                isFirstInteraction = true;
+                playSong(currentIndex);
+            }
+        });
+
+        playSong(currentIndex);
     </script>
 </body>
 </html>
