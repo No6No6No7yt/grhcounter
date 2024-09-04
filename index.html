@@ -3,23 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grh tracking</title></title>
+    <title>Grh Counter</title>
     <style>
-        :root {
-            --primary: #ff1493;
-            --secondary: #00ffff;
-            --background: #1a1a1a;
-            --text-color: #333;
-        }
-
         body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
-            background-color: var(--background);
-            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            position: relative;
+            flex-direction: column;
         }
 
         .background-video {
@@ -38,94 +35,142 @@
             left: 0;
             width: 100%;
             height: 100%;
+            background: rgba(0, 0, 0, 0.5);
             z-index: -2;
-            filter: blur(10px);
-            pointer-events: none;
         }
 
-        .content-wrapper {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .content {
+        .tracker {
             text-align: center;
-            color: #333;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 20px;
-            border-radius: 10px;
-            border: 2px solid black;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            font-size: 24px;
             margin-bottom: 20px;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border: 2px solid #1db954;
+            border-radius: 8px;
+            z-index: 1;
+            position: relative;
+            top: 10px;
         }
 
-        .timer {
-            font-size: 32px;
+        .tracker-title {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #b3b3b3;
+        }
+
+        .tracker-time {
+            font-size: 18px;
             font-weight: bold;
-            margin-bottom: 20px;
         }
 
-        .player-controls {
+        .player {
+            background-color: #282828;
+            border-radius: 12px;
+            padding: 24px;
+            width: 350px;
+            z-index: 1;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .song-info {
+            margin-bottom: 24px;
+        }
+
+        .song-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .artist {
+            font-size: 16px;
+            color: #b3b3b3;
+        }
+
+        .controls {
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-top: 20px;
+            margin-bottom: 24px;
         }
 
-        .player-controls button {
-            background: var(--primary);
+        .control-btn {
+            background: none;
             border: none;
-            border-radius: 50%;
-            color: var(--text-color);
+            color: #ffffff;
             cursor: pointer;
-            font-size: 24px;
-            height: 60px;
-            width: 60px;
-            margin: 0 15px;
-            transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+            margin: 0 12px;
+            padding: 0;
+        }
+
+        .control-btn svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .control-btn:hover svg {
+            fill: #1db954;
+        }
+
+        .progress-bar {
+            background-color: #535353;
+            height: 4px;
+            border-radius: 2px;
             position: relative;
+            cursor: pointer;
+            margin-bottom: 16px;
         }
 
-        .player-controls button::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 100%;
+        .progress {
+            background-color: #1db954;
             height: 100%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%);
+            border-radius: 2px;
+            width: 0%;
+        }
+
+        .time {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #b3b3b3;
+            margin-bottom: 16px;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+        }
+
+        .volume-icon {
+            margin-right: 8px;
+        }
+
+        .volume-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: #535353;
+            outline: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
-            transform: translate(-50%, -50%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            background: #ffffff;
+            cursor: pointer;
         }
 
-        .player-controls button:hover::before {
-            opacity: 1;
-        }
-
-        .player-controls button:hover {
-            background: var(--secondary);
-            transform: scale(1.1);
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .player-controls button:disabled {
-            background: #777;
-            cursor: not-allowed;
-        }
-
-        .current-song {
-            margin-top: 20px;
-            font-size: 20px;
-            color: var(--text-color);
+        .volume-slider::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ffffff;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -137,111 +182,137 @@
 
     <div class="overlay"></div>
 
-    <div class="content-wrapper">
-        <div class="content">
-            <h1>How long GRH takes to fix crashes on Synapse Z</h1>
-            <div class="timer" id="timer"></div>
+    <div class="tracker">
+        <div class="tracker-title">How Long Grh Takes To Fix Crashes</div>
+        <div class="tracker-time" id="crashFixTracker">0 days, 0 hours, 0 minutes</div>
+    </div>
 
-            <div class="current-song" id="current-song">Current Song: None</div>
-
-            <div class="player-controls">
-                <button id="prev-btn" disabled>&#9664;</button>
-                <button id="play-btn">Play</button>
-                <button id="next-btn" disabled>&#9654;&#9654;</button>
-            </div>
+    <div class="player">
+        <div class="song-info">
+            <div class="song-title" id="song-title">Bohemian Rhapsody</div>
+            <div class="artist" id="artist">Queen</div>
+        </div>
+        <div class="controls">
+            <button class="control-btn" id="prevBtn">
+                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+            </button>
+            <button class="control-btn" id="playPauseBtn">
+                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>
+            </button>
+            <button class="control-btn" id="nextBtn">
+                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+            </button>
+        </div>
+        <div class="progress-bar" id="progressBar">
+            <div class="progress" id="progress"></div>
+        </div>
+        <div class="time">
+            <span id="currentTime">0:00</span>
+            <span id="duration">0:00</span>
+        </div>
+        <div class="volume-control">
+            <svg class="volume-icon" width="18" height="18" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+            </svg>
+            <input type="range" min="0" max="1" step="0.1" value="1" class="volume-slider" id="volumeSlider">
         </div>
     </div>
 
-    <audio id="background-music" loop>
-        <source src="sigma.mp3" type="audio/mp3">
-        Your browser does not support the audio element.
-    </audio>
+    <audio id="audioPlayer" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
 
     <script>
-        const startDate = new Date("2024-07-27T07:40:00");
+        const audioPlayer = document.getElementById('audioPlayer');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progress = document.getElementById('progress');
+        const currentTimeEl = document.getElementById('currentTime');
+        const durationEl = document.getElementById('duration');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const crashFixTracker = document.getElementById('crashFixTracker');
 
-        function updateTimer() {
-            const now = new Date();
-            const timeDifference = now - startDate;
+        const tracks = [
+    { title: "Kompa Pasion", artist: "Frozy", src: "sigma.mp3" },
+    { title: "Cucurella Barella Nutella", artist: "Y2k Sports", src: "cu.mp3" },
+];
 
-            const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
 
-            document.getElementById("timer").innerHTML = 
-                `${days} days, ${hours} hours, ${minutes} minutes, ${seconds} seconds`;
+        let currentTrack = 0;
 
-            setTimeout(updateTimer, 1000);
-        }
-
-        updateTimer();
-
-        const playlist = [
-            { title: "kompa pasion", src: "sigma.mp3" },
-            { title: "Cucurella Barella Nutella", src: "cu.mp3" }
-        ];
-
-        const audio = document.getElementById('background-music');
-        const playButton = document.getElementById('play-btn');
-        const prevButton = document.getElementById('prev-btn');
-        const nextButton = document.getElementById('next-btn');
-        const currentSongElement = document.getElementById('current-song');
-
-        let currentIndex = 0;
-        let isFirstInteraction = false;
-
-        function playSong(index) {
-            if (index >= 0 && index < playlist.length) {
-                audio.src = playlist[index].src;
-                audio.play().catch(() => {});
-                playButton.innerHTML = '&#10074;&#10074;';
-                currentSongElement.textContent = `Current Song: ${playlist[index].title}`;
-                currentIndex = index;
-                updateButtonStates();
-            }
-        }
-
-        function updateButtonStates() {
-            prevButton.disabled = currentIndex === 0;
-            nextButton.disabled = currentIndex === playlist.length - 1;
-        }
-
-        playButton.addEventListener('click', () => {
-            if (!isFirstInteraction) {
-                isFirstInteraction = true;
-                audio.play().catch(() => {}); 
+        function togglePlayPause() {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+                playPauseBtn.innerHTML = '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
             } else {
-                if (audio.paused) {
-                    audio.play();
-                    playButton.innerHTML = '&#10074;&#10074;';
-                } else {
-                    audio.pause();
-                    playButton.innerHTML = '&#9654;';
-                }
+                audioPlayer.pause();
+                playPauseBtn.innerHTML = '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>';
             }
-        });
+        }
 
-        prevButton.addEventListener('click', () => {
-            if (currentIndex > 0) {
-                playSong(currentIndex - 1);
-            }
-        });
+        function updateProgress() {
+            const percent = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+            progress.style.width = `${percent}%`;
+            currentTimeEl.textContent = formatTime(audioPlayer.currentTime);
+            durationEl.textContent = formatTime(audioPlayer.duration);
+        }
 
-        nextButton.addEventListener('click', () => {
-            if (currentIndex < playlist.length - 1) {
-                playSong(currentIndex + 1);
-            }
-        });
+        function formatTime(time) {
+            const minutes = Math.floor(time / 60);
+            const seconds = Math.floor(time % 60);
+            return `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+        }
 
-        document.addEventListener('click', () => {
-            if (!isFirstInteraction) {
-                isFirstInteraction = true;
-                playSong(currentIndex);
-            }
-        });
+        function setProgress(event) {
+            const width = this.clientWidth;
+            const clickX = event.offsetX;
+            const duration = audioPlayer.duration;
+            audioPlayer.currentTime = (clickX / width) * duration;
+        }
 
-        playSong(currentIndex);
+        function changeTrack(direction) {
+            currentTrack = (currentTrack + direction + tracks.length) % tracks.length;
+            loadTrack(currentTrack);
+            audioPlayer.play();
+        }
+
+        function loadTrack(trackIndex) {
+            const track = tracks[trackIndex];
+            document.getElementById('song-title').textContent = track.title;
+            document.getElementById('artist').textContent = track.artist;
+            audioPlayer.src = track.src;
+            playPauseBtn.innerHTML = '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+        }
+
+        function changeVolume(event) {
+            audioPlayer.volume = event.target.value;
+        }
+
+        function updateCrashFixTracker() {
+            const eventDate = new Date('2024-07-27T00:00:00');
+            const currentDate = new Date();
+            const diff = currentDate - eventDate;
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            crashFixTracker.textContent = `${days} days, ${hours} hours, ${minutes} minutes, ${seconds} seconds`;
+        }
+
+        setInterval(updateCrashFixTracker, 1000);
+        updateCrashFixTracker();
+
+        audioPlayer.addEventListener('timeupdate', updateProgress);
+        audioPlayer.addEventListener('loadedmetadata', updateProgress);
+        playPauseBtn.addEventListener('click', togglePlayPause);
+        prevBtn.addEventListener('click', () => changeTrack(-1));
+        nextBtn.addEventListener('click', () => changeTrack(1));
+        progressBar.addEventListener('click', setProgress);
+        volumeSlider.addEventListener('input', changeVolume);
+
+        loadTrack(currentTrack);
     </script>
 </body>
 </html>
